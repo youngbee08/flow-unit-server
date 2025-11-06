@@ -11,6 +11,7 @@ const {
   checkTaskNameExist,
   updateTask,
   deleteTask,
+  findAssignedTasks,
 } = require("../controller/user");
 const isLoggedIn = require("../middlewares/IsLoggedIn");
 const userRouter = express.Router();
@@ -34,5 +35,6 @@ userRouter.patch("/updateProject/:projectID", isLoggedIn, updateProject);
 userRouter.patch("/updateTask/:taskID", isLoggedIn, updateTask);
 userRouter.delete("/deleteProject/:projectID", isLoggedIn, deleteProject);
 userRouter.delete("/deleteTask", isLoggedIn, deleteTask);
+userRouter.get("/findAssignedTasks", isLoggedIn, findAssignedTasks);
 
 module.exports = userRouter;

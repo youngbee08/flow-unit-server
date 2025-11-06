@@ -278,7 +278,8 @@ const updateProject = async (req, res, next) => {
     if (!findProject) {
       return res.status(400).json({
         status: "error",
-        message: "Couldn't find project with given ID or you don't have permission to update this project",
+        message:
+          "Couldn't find project with given ID or you don't have permission to update this project",
       });
     }
     if (req?.body?.name && req.body.name !== findProject.name) {
@@ -334,10 +335,12 @@ const deleteProject = async (req, res, next) => {
     });
   }
   try {
-    const findProject = await projectModel.findOne({
-      owner: req.user._id,
-      _id: projectID,
-    });
+    const findProject = await projectModel
+      .findOne({
+        createdBy: req.user._id,
+        _id: projectID,
+      })
+      .populate("tasks");
     if (!findProject) {
       return res.status(400).json({
         status: "error",
@@ -347,6 +350,7 @@ const deleteProject = async (req, res, next) => {
     }
     if (req?.body?.owner) delete req?.body?.owner;
 
+    await taskModel.deleteMany({ _id: { $in: findProject.tasks } });
     await projectModel.findByIdAndDelete(findProject._id);
     await userModel.findByIdAndUpdate(req.user._id, {
       $pull: { projects: findProject._id },
@@ -385,7 +389,7 @@ const createTask = async (req, res, next) => {
     if (!project) {
       return res.status(404).json({
         status: "error",
-        message: "Project not found",
+        message: "Couldn't find project to add this task to.",
       });
     }
 
@@ -533,7 +537,7 @@ const updateTask = async (req, res, next) => {
     if (!project) {
       return res.status(404).json({
         status: "error",
-        message: "Project not found",
+        message: "Invalid project ID, please provide a valid project ID.",
       });
     }
     const findTask = await taskModel.findOne({
@@ -543,7 +547,7 @@ const updateTask = async (req, res, next) => {
     if (!findTask) {
       return res.status(400).json({
         status: "error",
-        message: "Invalid task ID, please provide a valid task ID.",
+        message: "Invalid details, please provide a valid task or project ID.",
       });
     }
     const isOwner = project.createdBy._id.equals(req.user._id);
@@ -601,8 +605,10 @@ const updateTask = async (req, res, next) => {
           ? { progress, status: "completed" }
           : { progress, status: "pending" };
 
-      await projectModel.findByIdAndUpdate(project._id, { $set: updateBody });
-      await sendTaskCompletedMail(updateTask, freshProject, req.user);
+      await projectModel.findByIdAndUpdate(freshProject._id, {
+        $set: updateBody,
+      });
+      await sendTaskCompletedMail(updatedTask, freshProject, req.user);
 
       return res.status(200).json({
         status: "success",
@@ -726,6 +732,26 @@ const deleteTask = async (req, res, next) => {
   }
 };
 
+const findAssignedTasks = async (req, res, next) => {
+  if (!req?.user) {
+    return res.status(401).json({ status: "error", message: "Unauthorized" });
+  }
+  try {
+    const assignedTasks = await taskModel.find({ assignedTo: req.user._id });
+    return res.status(200).json({
+      status: "success",
+      message:
+        assignedTasks.length > 0
+          ? "Assigned tasks found"
+          : "No assigned tasks found",
+      tasks: assignedTasks,
+    });
+  } catch (error) {
+    console.log("findAssignedTasks-error", error);
+    next(error);
+  }
+};
+
 module.exports = {
   viewProfile,
   updatePassword,
@@ -738,4 +764,5 @@ module.exports = {
   checkTaskNameExist,
   updateTask,
   deleteTask,
+  findAssignedTasks,
 };

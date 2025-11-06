@@ -872,7 +872,7 @@ const sendTaskCompletedMail = async (task, project, user) => {
   const mailOptions = {
     from: `Support <${supportmail}>`,
     to: [createdBy.email, user.email],
-    subject: "Task Updated",
+    subject: "Task Completed",
     replyTo: supportmail,
     html: `
     <body
