@@ -1,9 +1,7 @@
 const express = require("express");
 const connectTodb = require("./config/connectTodb");
 const dotenv = require("dotenv");
-const authRouter = require("./routers/auth");
 const errorHandler = require("./middlewares/errorHandler");
-const userRouter = require("./routers/user");
 dotenv.config();
 
 const server = express();
@@ -19,9 +17,6 @@ const startServer = async () => {
 };
 
 startServer();
-
-server.use("/api/auth", authRouter);
-server.use("/api/user", userRouter);
 
 server.all("/{*any}", (req, res) => {
   res.status(403).json({
