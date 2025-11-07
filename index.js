@@ -2,6 +2,7 @@ const express = require("express");
 const connectTodb = require("./config/connectTodb");
 const dotenv = require("dotenv");
 const errorHandler = require("./middlewares/errorHandler");
+const waitlistRouter = require("./router/waitlist");
 dotenv.config();
 
 const server = express();
@@ -18,6 +19,7 @@ const startServer = async () => {
 
 startServer();
 
+server.use("/api", waitlistRouter);
 server.all("/{*any}", (req, res) => {
   res.status(403).json({
     status: "error",
