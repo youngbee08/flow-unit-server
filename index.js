@@ -3,10 +3,15 @@ const connectTodb = require("./config/connectTodb");
 const dotenv = require("dotenv");
 const errorHandler = require("./middlewares/errorHandler");
 const waitlistRouter = require("./router/waitlist");
+const cors = require("cors");
 dotenv.config();
 
 const server = express();
 server.use(express.json());
+const allowedOrigin = process.env.CLIENT_DOMAIN;
+server.use(
+  cors({ origin: allowedOrigin, methods: ["POST", "GET"], credentials: true })
+);
 const serverPort = process.env.SERVER_PORT || 1000;
 
 const startServer = async () => {
