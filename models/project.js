@@ -7,6 +7,12 @@ const projectSchema = new mongoose.Schema(
       required: [true, "Project name is required"],
       trim: true,
     },
+    projectType: {
+      type: String,
+      required: [true, "Project type is required"],
+      trim: true,
+      enum: ["personal", "team"],
+    },
     description: {
       type: String,
       required: [true, "Project description is required"],

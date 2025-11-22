@@ -10,6 +10,7 @@ const {
   sendTaskUpdatedMail,
   sendTaskCompletedMail,
 } = require("../utils/nodemailer/mailer");
+const teamModel = require("../models/team");
 
 const viewProfile = async (req, res, next) => {
   if (!req.user) {
@@ -172,6 +173,14 @@ const createProject = async (req, res, next) => {
   if (!req?.user) {
     return res.status(401).json({ status: "error", message: "Unauthorized" });
   }
+
+  if (!req.query.type) {
+    return res.status(400).json({
+      status: "error",
+      messsage: "Please provide your project type",
+    });
+  }
+
   if (Object.keys(req.body).length === 0) {
     return res
       .status(400)
@@ -180,6 +189,7 @@ const createProject = async (req, res, next) => {
 
   const { _id } = req.user;
   const { name } = req.body;
+  const { type } = req.query;
   try {
     const projectAlreadyExists = await projectModel.findOne({
       createdBy: _id,
@@ -192,7 +202,11 @@ const createProject = async (req, res, next) => {
       });
     }
 
-    const project = await projectModel.create({ ...req.body, createdBy: _id });
+    const project = await projectModel.create({
+      ...req.body,
+      createdBy: _id,
+      projectType: type,
+    });
     await userModel.findByIdAndUpdate(_id, {
       $push: { projects: project._id },
     });
@@ -748,6 +762,98 @@ const findAssignedTasks = async (req, res, next) => {
     });
   } catch (error) {
     console.log("findAssignedTasks-error", error);
+    next(error);
+  }
+};
+
+const createTeam = async (req, res, next) => {
+  if (!req?.user) {
+    return res.status(401).json({ status: "error", message: "Unauthorized" });
+  }
+  if (Object.keys(req.body).length === 0) {
+    return res
+      .status(400)
+      .json({ status: "error", message: "All fields are required" });
+  }
+  try {
+    const hasTeam = await userModel.findById(req.user._id);
+    if (hasTeam.ownerOf) {
+      return res.status(403).json({
+        status: "error",
+        message: "You can't have more than one team",
+      });
+    }
+    const newTeam = await teamModel.create({
+      ...req.body,
+      ownedBy: req.user._id,
+    });
+    if (!newTeam) {
+      return res.status(400).json({
+        status: "error",
+        message: "Could'nt create team, Please try again.",
+      });
+    }
+    await userModel.findByIdAndUpdate(req.user._id, { ownerOf: newTeam._id });
+    res.status(201).json({
+      status: "success",
+      message: "Team created succesfully, you can start adding members",
+      team: newTeam,
+    });
+  } catch (error) {
+    console.log("Error while creating team", error);
+    next(error);
+  }
+};
+
+const findMyTeam = async (req, res, next) => {
+  if (!req?.user) {
+    return res.status(401).json({ status: "error", message: "Unauthorized" });
+  }
+  try {
+    const myTeam = await teamModel.findById(req.user.ownerOf);
+    if (!myTeam) {
+      return res.status(200).json({
+        status: "success",
+        message: "Couldn't find any team owned by you",
+      });
+    }
+    res.status(200).json({
+      status: "success",
+      message: "Team found successfully",
+      team: myTeam,
+    });
+  } catch (error) {
+    console.log("Error while finding user team", error);
+    next(error);
+  }
+};
+
+const updateTeam = async (req, res, next) => {
+  if (!req?.user) {
+    return res.status(401).json({ status: "error", message: "Unauthorized" });
+  }
+  if (Object.keys(req.body).length === 0) {
+    return res
+      .status(400)
+      .json({ status: "error", message: "All fields are required" });
+  }
+  const { name, about } = req.body;
+  try {
+    const updatedInfo = await teamModel.findByIdAndUpdate(req.user._id, {
+      name,
+      about,
+    });
+    if (!updatedInfo) {
+      return res.status(400).json({
+        status: "error",
+        message: "Failed to update team info, Please try again.",
+      });
+    }
+    res
+      .status(204)
+      .json({ status: "success", message: "Team info updated successfully" });
+  } catch (error) {
+    console.log("Error while updating team info", error);
     next(error);
   }
 };
