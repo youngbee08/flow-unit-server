@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap"
+      rel="stylesheet"
+    />
+    <title>FlowUnit Server | Node.js .Express.js</title>
+
+    <style>
+      :root {
+        --color-primary: #13213b;
+        --color-tertiary: #e0e0e0;
+        --accent: #b7babe;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Nunito", sans-serif;
+      }
+      body {
+        background: var(--color-primary);
+        color: var(--color-tertiary);
+        scroll-behavior: smooth;
+      }
+
+      /* === HEADER SECTION === */
+      header {
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        text-align: center;
+        padding: 20px;
+        background: linear-gradient(160deg, #13213b 0%, #13213b 100%);
+        animation: fadeUp 1.3s ease;
+      }
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(25px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      h1 {
+        font-size: 3rem;
+        background: linear-gradient(45deg, #b7babe, #b7babe);
+        -webkit-background-clip: text;
+        color: transparent;
+        letter-spacing: 1.4px;
+      }
+      .tagline {
+        font-size: 1.15rem;
+        margin: 18px 0 35px;
+        opacity: 0.9;
+      }
+
+      /* nav btn */
+      header a {
+        background: var(--accent);
+        color: #000;
+        text-decoration: none;
+        padding: 12px 22px;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: 0.35s;
+      }
+      header a:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 0 22px rgba(224, 224, 224, 0.45);
+      }
+
+      /* === SECTION STYLING === */
+      section {
+        max-width: 900px;
+        margin: 70px auto;
+        padding: 40px;
+        border-radius: 14px;
+        background: #00141f;
+        box-shadow: 0 0 35px rgba(0, 255, 200, 0.08);
+        border: 1px solid rgba(0, 255, 200, 0.04);
+      }
+      section h2 {
+        font-size: 2rem;
+        margin-bottom: 18px;
+        border-left: 4px solid var(--accent);
+        padding-left: 10px;
+      }
+      p {
+        line-height: 1.7rem;
+        margin-bottom: 10px;
+        opacity: 0.88;
+      }
+
+      .code {
+        background: #000c13;
+        border: 1px solid rgba(0, 255, 200, 0.12);
+        padding: 14px;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        overflow: auto;
+        white-space: pre-wrap;
+        margin-top: 12px;
+      }
+
+      /* links */
+      a.link {
+        display: inline-block;
+        margin-top: 10px;
+        text-decoration: none;
+        color: var(--accent);
+        font-weight: 600;
+      }
+
+      /* === WAITLIST FORM SECTION === */
+      form {
+        margin-top: 20px;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      input {
+        flex: 1;
+        padding: 12px;
+        border: none;
+        outline: none;
+        border-radius: 6px;
+        background: #e0e0e0;
+      }
+      button {
+        padding: 12px 22px;
+        border: none;
+        cursor: pointer;
+        font-weight: 600;
+        border-radius: 6px;
+        background: var(--accent);
+        color: #000;
+      }
+      button:hover {
+        opacity: 0.85;
+      }
+
+      .result {
+        margin-top: 14px;
+        padding: 12px;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        display: none;
+        background: var(--color-primary);
+        opacity: 0.8;
+      }
+
+      /* FOOTER */
+      footer {
+        text-align: center;
+        margin: 60px 0 25px;
+        opacity: 0.55;
+        font-size: 0.9rem;
+      }
+
+      /* 📱 Mobile Friendly Padding + Typography */
+      @media (max-width: 768px) {
+        header {
+          padding: 40px 20px;
+        }
+
+        section {
+          margin: 40px 15px;
+          padding: 25px;
+        }
+
+        h1 {
+          font-size: 2.2rem;
+          line-height: 2.7rem;
+        }
+
+        .tagline {
+          font-size: 1rem;
+          margin: 15px 0 25px;
+        }
+
+        h2 {
+          font-size: 1.6rem;
+        }
+
+        .code {
+          font-size: 0.85rem;
+          padding: 12px;
+        }
+
+        form {
+          flex-direction: column;
+        }
+
+        input,
+        button {
+          width: 100%;
+          font-size: 1rem;
+        }
+
+        footer {
+          padding: 0 12px;
+          font-size: 0.85rem;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <h1>FlowUnit Server API ⚡</h1>
+      <p class="tagline">
+        Secure, Fast & Built For User Growth, Project management system powered
+        by Node.js
+      </p>
+      <a href="#docs">Explore API</a>
+    </header>
+
+    <!-- 📌 SECTION: Documentation Overview -->
+    <section id="docs">
+      <h2>📄 Documentation</h2>
+      <p>
+        This backend is currently in <strong>waitlist phase</strong> and
+        supports joining users through a POST route. More endpoints will be
+        available as the platform grows.
+      </p>
+
+      <div class="code">
+        POST /api/waitlist/ Content-Type: application/json Body Example: {
+        "email": "user@email.com" }
+      </div>
+      <a class="link" href="#test">Jump to API Tester ↓</a>
+    </section>
+
+    <!-- 🔥 SECTION: Endpoints -->
+    <section>
+      <h2>🔌 Available Endpoints</h2>
+
+      <p>1️⃣ Join Waitlist</p>
+      <div class="code">POST /api/waitlist/</div>
+      <p>Stores submitted email into waiting list pending system launch.</p>
+
+      <br />
+      <p>Frontend UI Integration:</p>
+      <a class="link" href="https://flowunitapp.vercel.app/" target="_blank"
+        >🌍 Join from UI</a
+      >
+
+      <p>Source Code:</p>
+      <a
+        class="link"
+        href="https://github.com/youngbee08/flow-unit-server/tree/waitlist"
+        target="_blank"
+        >💻 View GitHub Repo</a
+      >
+    </section>
+
+    <!-- 🚀 SECTION: Live API Form -->
+    <section id="test">
+      <h2>🚀 Test Waitlist API</h2>
+      <p>
+        Submit an email and send a request directly to your live backend server.
+      </p>
+
+      <form onsubmit="submitEmail(event)">
+        <input type="email" id="email" placeholder="Enter email..." required />
+        <button type="submit">Join Waitlist</button>
+      </form>
+
+      <div id="res" class="result"></div>
+    </section>
+
+    <footer>
+      FlowUnit © <span id="year"></span> — Running on Node.js & Express
+    </footer>
+
+    <script>
+      document.getElementById("year").textContent = new Date().getFullYear();
+
+      function submitEmail(e) {
+        e.preventDefault();
+        const email = document.getElementById("email").value;
+        const resDiv = document.getElementById("res");
+
+        fetch("/api/waitlist/", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        })
+          .then((r) => r.json())
+          .then((data) => {
+            resDiv.style.display = "block";
+            resDiv.innerText = JSON.stringify(data, null, 2);
+          })
+          .catch((err) => {
+            resDiv.style.display = "block";
+            resDiv.innerText = "Error → " + err.message;
+          });
+      }
+    </script>
+  </body>
+</html>

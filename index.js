@@ -4,6 +4,7 @@ const dotenv = require("dotenv");
 const errorHandler = require("./middlewares/errorHandler");
 const waitlistRouter = require("./router/waitlist");
 const cors = require("cors");
+const path = require("path");
 dotenv.config();
 
 const server = express();
@@ -12,6 +13,7 @@ const allowedOrigin = process.env.CLIENT_DOMAIN;
 server.use(
   cors({ origin: allowedOrigin, methods: ["POST", "GET"], credentials: true })
 );
+server.use(express.static(path.join(__dirname, "public")));
 const serverPort = process.env.SERVER_PORT || 1000;
 
 const startServer = async () => {

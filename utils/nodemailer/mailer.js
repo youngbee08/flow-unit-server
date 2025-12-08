@@ -125,6 +125,3 @@ const sendWaitlistMail = async (user, userName) => {
 module.exports = {
   sendWaitlistMail,
 };
-
-
-
