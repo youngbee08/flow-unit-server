@@ -39,6 +39,13 @@ const errorHandler = (error, req, res, next) => {
     error?.code || error?.cause?.code || error?.originalError?.code;
   const errorName = error?.name;
 
+  if (error.message === "jwt expired") {
+    return res.status(401).json({
+      status: "error",
+      message: "Unauthorized",
+    });
+  }
+
   if (errorCode === 11000) {
     const err = handleDuplicateError(error);
     return res.status(err.status).json({

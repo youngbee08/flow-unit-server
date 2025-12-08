@@ -12,6 +12,9 @@ const {
   updateTask,
   deleteTask,
   findAssignedTasks,
+  createTeam,
+  findMyTeam,
+  updateTeam,
 } = require("../controller/user");
 const isLoggedIn = require("../middlewares/IsLoggedIn");
 const userRouter = express.Router();
@@ -36,5 +39,8 @@ userRouter.patch("/updateTask/:taskID", isLoggedIn, updateTask);
 userRouter.delete("/deleteProject/:projectID", isLoggedIn, deleteProject);
 userRouter.delete("/deleteTask", isLoggedIn, deleteTask);
 userRouter.get("/findAssignedTasks", isLoggedIn, findAssignedTasks);
+userRouter.post("/createTeam", isLoggedIn, createTeam);
+userRouter.get("/myTeam", isLoggedIn, findMyTeam);
+userRouter.patch("/updateTeamInfo", isLoggedIn, updateTeam);
 
 module.exports = userRouter;

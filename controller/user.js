@@ -201,15 +201,41 @@ const createProject = async (req, res, next) => {
         message: "You already have a project with that name.",
       });
     }
+    let project;
 
-    const project = await projectModel.create({
-      ...req.body,
-      createdBy: _id,
-      projectType: type,
-    });
-    await userModel.findByIdAndUpdate(_id, {
-      $push: { projects: project._id },
-    });
+    if (type === "personal") {
+      project = await projectModel.create({
+        ...req.body,
+        createdBy: _id,
+        projectType: type,
+      });
+      await userModel.findByIdAndUpdate(_id, {
+        $push: { projects: project._id },
+      });
+    } else if (type === "team") {
+      const userTeam = await teamModel.findById(req.user.ownerOf);
+      if (!userTeam) {
+        return res.status(403).json({
+          status: "error",
+          message:
+            "Couldn't create team project, Seems you dont have any team.",
+        });
+      }
+      project = await projectModel.create({
+        ...req.body,
+        createdBy: _id,
+        projectType: type,
+      });
+      await teamModel.findByIdAndUpdate(userTeam._id, {
+        $push: { projects: project._id },
+      });
+    } else {
+      return res.status(400).json({
+        status: "error",
+        message: "Project type must be either team or personal, ",
+      });
+    }
+
     await sendProjectCreatedMail(project, req.user);
     res.status(201).json({
       status: "success",
@@ -366,9 +392,18 @@ const deleteProject = async (req, res, next) => {
 
     await taskModel.deleteMany({ _id: { $in: findProject.tasks } });
     await projectModel.findByIdAndDelete(findProject._id);
-    await userModel.findByIdAndUpdate(req.user._id, {
-      $pull: { projects: findProject._id },
-    });
+    if (findProject.projectType === "personal") {
+      await userModel.findByIdAndUpdate(req.user._id, {
+        $pull: { projects: findProject._id },
+      });
+    } else {
+      await teamModel.findOneAndUpdate(
+        { ownedBy: req.user._id },
+        {
+          $pull: { projects: findProject._id },
+        }
+      );
+    }
 
     res.status(200).json({
       status: "success",
@@ -837,12 +872,14 @@ const updateTeam = async (req, res, next) => {
       .status(400)
       .json({ status: "error", message: "All fields are required" });
   }
-  const { name, about } = req.body;
+  if (req.body.ownedBy) delete req.body.ownedBy;
+  if (req.body.members) delete req.body.members;
+  if (req.body.projects) delete req.body.projects;
   try {
-    const updatedInfo = await teamModel.findByIdAndUpdate(req.user._id, {
-      name,
-      about,
-    });
+    const updatedInfo = await teamModel.findByIdAndUpdate(
+      req.user.ownerOf,
+      req.body
+    );
     if (!updatedInfo) {
       return res.status(400).json({
         status: "error",
@@ -850,7 +887,7 @@ const updateTeam = async (req, res, next) => {
       });
     }
     res
-      .status(204)
+      .status(200)
       .json({ status: "success", message: "Team info updated successfully" });
   } catch (error) {
     console.log("Error while updating team info", error);
@@ -871,4 +908,7 @@ module.exports = {
   updateTask,
   deleteTask,
   findAssignedTasks,
+  createTeam,
+  findMyTeam,
+  updateTeam,
 };
