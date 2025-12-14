@@ -15,6 +15,11 @@ const {
   createTeam,
   findMyTeam,
   updateTeam,
+  inviteToTeam,
+  acceptInvitation,
+  declineInvitation,
+  assignTask,
+  deleteAccount,
 } = require("../controller/user");
 const isLoggedIn = require("../middlewares/IsLoggedIn");
 const userRouter = express.Router();
@@ -29,11 +34,7 @@ userRouter.get(
   isLoggedIn,
   checkProjectNameExist
 );
-userRouter.get(
-  "/validateTaskName",
-  isLoggedIn,
-  checkTaskNameExist
-);
+userRouter.get("/validateTaskName", isLoggedIn, checkTaskNameExist);
 userRouter.patch("/updateProject/:projectID", isLoggedIn, updateProject);
 userRouter.patch("/updateTask/:taskID", isLoggedIn, updateTask);
 userRouter.delete("/deleteProject/:projectID", isLoggedIn, deleteProject);
@@ -42,5 +43,14 @@ userRouter.get("/findAssignedTasks", isLoggedIn, findAssignedTasks);
 userRouter.post("/createTeam", isLoggedIn, createTeam);
 userRouter.get("/myTeam", isLoggedIn, findMyTeam);
 userRouter.patch("/updateTeamInfo", isLoggedIn, updateTeam);
+userRouter.post("/inviteToTeam/:userID", isLoggedIn, inviteToTeam);
+userRouter.post(
+  "/acceptInvitation/:teamID/:token",
+  isLoggedIn,
+  acceptInvitation
+);
+userRouter.post("/declineInvitation/:token", isLoggedIn, declineInvitation);
+userRouter.post("/assignTask", isLoggedIn, assignTask);
+userRouter.delete("/deleteAccount", isLoggedIn, deleteAccount);
 
 module.exports = userRouter;

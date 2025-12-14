@@ -9,8 +9,12 @@ const {
   sendTaskCreatedMail,
   sendTaskUpdatedMail,
   sendTaskCompletedMail,
+  sendInvitationMail,
+  sendTaskAssignmentMail,
 } = require("../utils/nodemailer/mailer");
 const teamModel = require("../models/team");
+const { generateInvitationToken } = require("../services/otpGenerator");
+const invitationModel = require("../models/invitation");
 
 const viewProfile = async (req, res, next) => {
   if (!req.user) {
@@ -92,7 +96,6 @@ const updatePassword = async (req, res, next) => {
     }
 
     const hashedPassword = await hashPassword(newPassword);
-    console.log(hashedPassword);
     await userModel.findByIdAndUpdate(req.user._id, {
       password: hashedPassword,
     });
@@ -602,7 +605,7 @@ const updateTask = async (req, res, next) => {
     const isOwner = project.createdBy._id.equals(req.user._id);
     const isAssigned = findTask.assignedTo.equals(req.user._id);
 
-    if (!isOwner && !isAssigned) {
+    if (!isOwner || !isAssigned) {
       return res.status(403).json({
         status: "error",
         message: "You don't have permission to update this task.",
@@ -895,6 +898,295 @@ const updateTeam = async (req, res, next) => {
   }
 };
 
+const inviteToTeam = async (req, res, next) => {
+  if (!req?.user) {
+    return res.status(401).json({ status: "error", message: "Unauthorized" });
+  }
+  if (Object.keys(req.body).length === 0) {
+    return res
+      .status(400)
+      .json({ status: "error", message: "All fields are required" });
+  }
+  if (!req.user.ownerOf) {
+    return res.status(403).json({
+      status: "error",
+      message: "Please make sure you have a team before making this request",
+    });
+  }
+  if (!req.params.userID) {
+    return res.status(400).json({
+      status: "error",
+      message: "Please provide ID for the invitee!",
+    });
+  }
+  if (!mongoose.Types.ObjectId.isValid(req.params.userID)) {
+    return res.status(400).json({ message: "Invalid user ID" });
+  }
+  if (req.body.invitationToken) delete req.body.invitationToken;
+  if (req.body.expDate) delete req.body.expDate;
+  try {
+    const userTeam = await teamModel.findById(req.user.ownerOf);
+    if (!userTeam) {
+      return res.status(400).json({
+        status: "error",
+        mesage:
+          "Couldn't find your team to add invitee, please contact support for more info.",
+      });
+    }
+    const invitee = await userModel.findById(req.params.userID);
+    if (!invitee) {
+      return res.status(400).json({
+        status: "error",
+        message:
+          "Invalid ID, Couldn't found an account with the ID you provide.",
+      });
+    }
+    if (
+      userTeam.members.some((id) => id.toString() === invitee._id.toString())
+    ) {
+      return res.status(403).json({
+        status: "error",
+        message: "The user you want to invite already exists in your team!",
+      });
+    }
+    let token = generateInvitationToken(16);
+    const invitationExp = Date.now() + 24 * 60 * 60 * 1000;
+    const invitationWithToken = await invitationModel.find({
+      invitationToken: token,
+    });
+    if (invitationWithToken) {
+      token = generateInvitationToken(12);
+    }
+    const invitation = await invitationModel.create({
+      ...req.body,
+      invitationToken: token,
+      expDate: invitationExp,
+    });
+    if (!invitation) {
+      return res.status(400).json({
+        status: "error",
+        message: "Failed to create invitation, please try again.",
+      });
+    }
+    await sendInvitationMail(token, userTeam, invitee);
+    res.status(200).json({
+      status: "success",
+      message: "Invitation created successsfully and will expire in 24Hrs!",
+      note: "An email regarding the invite has been sent to the invitee*",
+    });
+  } catch (error) {
+    console.log("invite-to-team-error", error);
+    next(error);
+  }
+};
+
+const acceptInvitation = async (req, res, next) => {
+  if (!req?.user) {
+    return res.status(401).json({ status: "error", message: "Unauthorized" });
+  }
+  if (Object.keys(req.body).length === 0) {
+    return res
+      .status(400)
+      .json({ status: "error", message: "All fields are required" });
+  }
+  if (!req.params.teamID) {
+    return res.status(403).json({
+      status: "error",
+      message: "Please provide the ID of the team you want to join.",
+    });
+  }
+  if (!req.params.token) {
+    return res.status(403).json({
+      status: "error",
+      message: "Please provide the token of the invitation",
+    });
+  }
+  if (!mongoose.Types.ObjectId.isValid(req.params.teamID)) {
+    return res.status(400).json({ message: "Invalid team ID" });
+  }
+  try {
+    const invitation = await invitationModel.findOne({
+      invitationToken: req.params.token,
+    });
+    if (!invitation) {
+      return res.status(400).json({
+        status: "error",
+        message:
+          "Invalid invitation, seems it has been used by you, Please request a new one",
+      });
+    }
+    if (Date.now() >= invitation.expDate) {
+      return res.status(410).json({
+        status: "error",
+        message: "This invitation has expired, Please request a new one",
+      });
+    }
+    const team = await teamModel.findById(req.params.teamID);
+    if (!team) {
+      return res
+        .status(400)
+        .json({ status: "error", message: "Please provide a valid team ID " });
+    }
+    await invitationModel.findOneAndUpdate(
+      { invitationToken: req.params.token },
+      { invitationToken: null, expDate: null }
+    );
+    await teamModel.findByIdAndUpdate(team._id, {
+      $push: { members: req.user._id },
+    });
+    res.status(200).json({
+      status: "success",
+      message: `Invitation accepted successfully, you're now a member of ${
+        team.name || "this"
+      } team`,
+    });
+  } catch (error) {
+    console.log("acceptInvitation-error", error);
+    next(error);
+  }
+};
+
+const declineInvitation = async (req, res, next) => {
+  if (!req?.user) {
+    return res.status(401).json({ status: "error", message: "Unauthorized" });
+  }
+  if (Object.keys(req.body).length === 0) {
+    return res
+      .status(400)
+      .json({ status: "error", message: "All fields are required" });
+  }
+  if (!req.params.token) {
+    return res.status(403).json({
+      status: "error",
+      message: "Please provide the token of the invitation",
+    });
+  }
+  try {
+    const invitation = await invitationModel.findOne({
+      invitationToken: req.params.token,
+    });
+    if (!invitation) {
+      return res.status(400).json({
+        status: "error",
+        message:
+          "Invalid invitation, seems it has been used by you, Please request a new one",
+      });
+    }
+    if (Date.now() >= invitation.expDate) {
+      return res.status(410).json({
+        status: "error",
+        message: "This invitation has expired, Please request a new one",
+      });
+    }
+    await invitationModel.findOneAndUpdate(
+      { invitationToken: req.params.token },
+      { invitationToken: null, expDate: null }
+    );
+    res.status(200).json({
+      status: "success",
+      message: `Invitation declined successfully`,
+    });
+  } catch (error) {
+    console.log("decline-invitation-error", error);
+    next(error);
+  }
+};
+
+const assignTask = async (req, res, next) => {
+  if (!req?.user) {
+    return res.status(401).json({ status: "error", message: "Unauthorized" });
+  }
+  if (Object.keys(req.body).length === 0) {
+    return res
+      .status(400)
+      .json({ status: "error", message: "All fields are required" });
+  }
+  if (!req.query.task) {
+    return res.status(403).json({
+      status: "error",
+      message: "Please provide the ID of the task you want to assign.",
+    });
+  }
+  if (!mongoose.Types.ObjectId.isValid(req.query.task)) {
+    return res.status(400).json({ message: "Invalid task ID" });
+  }
+  if (!req.query.member) {
+    return res.status(403).json({
+      status: "error",
+      message:
+        "Please provide the ID of the member you want to assign this task to.",
+    });
+  }
+  if (!mongoose.Types.ObjectId.isValid(req.query.member)) {
+    return res.status(400).json({ message: "Invalid member ID" });
+  }
+  try {
+    const isTaskAssigned = await taskModel.findOne({
+      _id: req.query.task,
+      assignedTo: req.query.member,
+    });
+    if (isTaskAssigned) {
+      return res.status(400).json({
+        status: "error",
+        message: "This task is already assigned to this member before",
+      });
+    }
+    const member = await userModel.findById(req.query.member);
+    const task = await taskModel.findById(req.query.task);
+    await taskModel.findByIdAndUpdate(task._id, { assignedTo: member._id });
+    await sendTaskAssignmentMail(task.description, req.user.name, member);
+    res.status(200).json({
+      status: "success",
+      message: `Task assigned to ${member.userName} successfully`,
+    });
+  } catch (error) {
+    console.log(error);
+    next("assignTask-error", error);
+  }
+};
+
+const deleteAccount = async (req, res, next) => {
+  if (!req?.user) {
+    return res.status(401).json({ status: "error", message: "Unauthorized" });
+  }
+
+  try {
+    if (req.user.ownerOf) {
+      await teamModel.findOneAndDelete({
+        ownedBy: req.user._id,
+      });
+    }
+
+    const userProjects = await projectModel.find({
+      createdBy: req.user._id,
+    });
+
+    if (userProjects.length > 0) {
+      const allTaskIds = userProjects.flatMap((project) => project.tasks || []);
+
+      if (allTaskIds.length > 0) {
+        await taskModel.deleteMany({
+          _id: { $in: allTaskIds },
+        });
+      }
+
+      await projectModel.deleteMany({
+        createdBy: req.user._id,
+      });
+    }
+
+    await userModel.findByIdAndDelete(req.user._id);
+    return res.status(200).json({
+      status: "success",
+      message: "Account and all related data deleted successfully",
+    });
+  } catch (error) {
+    console.log("deleteAccount-Error", error);
+    next(error);
+  }
+};
+
+
 module.exports = {
   viewProfile,
   updatePassword,
@@ -911,4 +1203,9 @@ module.exports = {
   createTeam,
   findMyTeam,
   updateTeam,
+  inviteToTeam,
+  acceptInvitation,
+  declineInvitation,
+  assignTask,
+  deleteAccount,
 };

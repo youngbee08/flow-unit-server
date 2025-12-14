@@ -2,7 +2,12 @@ const userModel = require("../models/user");
 const { hashPassword, verifyPassword } = require("../services/bcrypt");
 const { gnerateToken } = require("../services/jwt");
 const { generateOtp } = require("../services/otpGenerator");
-const { sendOtpMail, sendWelcomeMail, sendPasswordResetMail, sendPasswordResetSecurityMail } = require("../utils/nodemailer/mailer");
+const {
+  sendOtpMail,
+  sendWelcomeMail,
+  sendPasswordResetMail,
+  sendPasswordResetSecurityMail,
+} = require("../utils/nodemailer/mailer");
 
 const signUp = async (req, res, next) => {
   const { body } = req;
@@ -173,15 +178,15 @@ const requestResetPassword = async (req, res, next) => {
         message: "Invalid email, please provide your valid email",
       });
     }
-      const otp = generateOtp(6);
-      const otpExp = Date.now() + 5 * 60 * 1000;
+    const otp = generateOtp(6);
+    const otpExp = Date.now() + 5 * 60 * 1000;
 
-    await userModel.findByIdAndUpdate(validateUser._id, {otp,otpExp})
-    await sendPasswordResetMail(validateUser,validateUser.userName,otp)
+    await userModel.findByIdAndUpdate(validateUser._id, { otp, otpExp });
+    await sendPasswordResetMail(validateUser, validateUser.userName, otp);
     res.status(200).json({
-      status:"success",
-      message:"Password reset request mail sent successfully"
-    })
+      status: "success",
+      message: "Password reset request mail sent successfully",
+    });
   } catch (error) {
     console.log("requestResetPassword-error", error);
     next(error);
@@ -220,7 +225,7 @@ const resendResetPasswordOtp = async (req, res, next) => {
   }
 };
 
-const resetPassword = async (req,res,next) => {
+const resetPassword = async (req, res, next) => {
   if (!req?.body?.email) {
     return res.status(400).json({
       status: "error",
@@ -246,7 +251,7 @@ const resetPassword = async (req,res,next) => {
     });
   }
   try {
-    const {email,code,newPassword,confirmNewPassword} = req.body;
+    const { email, code, newPassword, confirmNewPassword } = req.body;
 
     const user = await userModel.findOne({ email });
     if (!user) {
@@ -267,35 +272,38 @@ const resetPassword = async (req,res,next) => {
     if (validateCodeExp) {
       return res.status(410).json({
         status: "error",
-        message:
-          "The code you entered has expired, please request a new one.",
+        message: "The code you entered has expired, please request a new one.",
       });
     }
-    const comparePassword = await verifyPassword(newPassword,user);
+    const comparePassword = await verifyPassword(newPassword, user);
     if (comparePassword) {
       return res.status(400).json({
-        status:"error",
-        message:"New password can't be the same as your old password"
-      })
+        status: "error",
+        message: "New password can't be the same as your old password",
+      });
     }
     if (confirmNewPassword !== newPassword) {
       return res.status(400).json({
         status: "error",
         message: "Password doesn't match",
-      }); 
+      });
     }
     const hashedPassword = await hashPassword(newPassword);
-    await userModel.findByIdAndUpdate(user._id, {password:hashedPassword, otp:null, otpExp:null});
-    await sendPasswordResetSecurityMail(user,user.userName)
-    res .status(200).json({
-      status:"success",
-      message:"Password reset successfull"
-    })
+    await userModel.findByIdAndUpdate(user._id, {
+      password: hashedPassword,
+      otp: null,
+      otpExp: null,
+    });
+    await sendPasswordResetSecurityMail(user, user.userName);
+    res.status(200).json({
+      status: "success",
+      message: "Password reset successfull",
+    });
   } catch (error) {
-    console.log("resetPassword-error", error)
-    next(error)
+    console.log("resetPassword-error", error);
+    next(error);
   }
-}
+};
 
 const login = async (req, res, next) => {
   if (!req?.body?.userName) {

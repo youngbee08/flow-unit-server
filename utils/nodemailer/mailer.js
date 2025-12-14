@@ -193,7 +193,7 @@ const sendWelcomeMail = async (user, userName, otp) => {
 
 const sendOtpMail = async (user, userName, otp) => {
   const mailOptions = {
-    from: `Support <${supportmail}>`,
+    from: `FlowUnit Team <${supportmail}>`,
     to: user.email,
     subject: "Flow Unit OTP",
     replyTo: supportmail,
@@ -305,7 +305,7 @@ const sendOtpMail = async (user, userName, otp) => {
 
 const sendPasswordResetMail = async (user, userName, otp) => {
   const mailOptions = {
-    from: `Support <${supportmail}>`,
+    from: `FlowUnit Team <${supportmail}>`,
     to: user.email,
     subject: "Password Reset Request",
     replyTo: supportmail,
@@ -423,7 +423,7 @@ const sendPasswordResetMail = async (user, userName, otp) => {
 
 const sendPasswordResetSecurityMail = async (user, userName) => {
   const mailOptions = {
-    from: `Support <${supportmail}>`,
+    from: `FlowUnit Team <${supportmail}>`,
     to: user.email,
     subject: "Password Reset Successful",
     replyTo: supportmail,
@@ -524,7 +524,7 @@ const sendProjectCreatedMail = async (project, user) => {
   const { name, projectID } = project;
   const { userName, email } = user;
   const mailOptions = {
-    from: `Support <${supportmail}>`,
+    from: `FlowUnit Team <${supportmail}>`,
     to: email,
     subject: "Project Created Successful",
     replyTo: supportmail,
@@ -595,17 +595,14 @@ const sendProjectCreatedMail = async (project, user) => {
     `,
   };
   const mail = await transporter.sendMail(mailOptions);
-  console.log(
-    "Project create mail sent successfully:",
-    mail.messageId
-  );
+  console.log("Project create mail sent successfully:", mail.messageId);
 };
 
 const sendProjectupdatedMail = async (project, user, changes) => {
   const { name } = project;
   const { userName, email } = user;
   const mailOptions = {
-    from: `Support <${supportmail}>`,
+    from: `FlowUnit Team <${supportmail}>`,
     to: email,
     subject: "Project Updated Successful",
     replyTo: supportmail,
@@ -647,8 +644,8 @@ const sendProjectupdatedMail = async (project, user, changes) => {
                         <p style="font-size: 14px; color: #003366; margin: 0 0 8px 0; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Change Summary</p>
                         <p style="font-size: 15px; line-height: 1.6; color: #2d3748; margin: 0;">
                         ${
-                            changes ||
-                            "Minor updates were made to your project details."
+                          changes ||
+                          "Minor updates were made to your project details."
                         }
                         </p>
                     </td>
@@ -664,7 +661,7 @@ const sendProjectupdatedMail = async (project, user, changes) => {
                     <tr>
                     <td align="center" bgcolor="#003366" style="border-radius: 6px;">
                         <a href="${
-                        clientDomain || "https://flowunit.vercel.app"
+                          clientDomain || "https://flowunit.vercel.app"
                         }/projects" style="font-size: 15px; color: #ffffff; text-decoration: none; padding: 14px 40px; display: inline-block; font-weight: 600; letter-spacing: 0.5px;">
                         View Project
                         </a>
@@ -680,10 +677,10 @@ const sendProjectupdatedMail = async (project, user, changes) => {
                         <strong style="display: block; margin-bottom: 6px;">Friendly Reminder</strong>
                         If you didn’t make this change or notice any unexpected updates, please contact our support team immediately at 
                         <a href="mailto:${
-                            supportmail || "youngbeeh08@gmail.com"
+                          supportmail || "youngbeeh08@gmail.com"
                         }" style="color: #003366; text-decoration: underline;">${
-        supportmail || "youngbeeh08@gmail.com"
-        }</a>.
+      supportmail || "youngbeeh08@gmail.com"
+    }</a>.
                         </p>
                     </td>
                     </tr>
@@ -709,15 +706,15 @@ const sendProjectupdatedMail = async (project, user, changes) => {
                 <p style="font-size: 11px; line-height: 1.5; color: #a0aec0; margin: 0;">
                     &copy; 2025 Flow Unit. All rights reserved.<br>
                     <a href="mailto:${
-                    supportmail || "youngbeeh08@gmail.com"
+                      supportmail || "youngbeeh08@gmail.com"
                     }" style="color: #003366; text-decoration: none;">${
-        supportmail || "youngbeeh08@gmail.com"
-        }</a> |
+      supportmail || "youngbeeh08@gmail.com"
+    }</a> |
                     <a href="${
-                    clientDomain || "https://flowunit.vercel.app"
+                      clientDomain || "https://flowunit.vercel.app"
                     }" style="color: #003366; text-decoration: none;">flowunit.vercel.app</a> |
                     <a href="${
-                    clientDomain || "https://flowunit.vercel.app"
+                      clientDomain || "https://flowunit.vercel.app"
                     }/privacy" style="color: #003366; text-decoration: none;">Privacy Policy</a>
                 </p>
                 </td>
@@ -732,17 +729,14 @@ const sendProjectupdatedMail = async (project, user, changes) => {
     `,
   };
   const mail = await transporter.sendMail(mailOptions);
-  console.log(
-    "Project update mail sent successfully:",
-    mail.messageId
-  );
+  console.log("Project update mail sent successfully:", mail.messageId);
 };
 
-const sendTaskCreatedMail = async (task,project, user) => {
+const sendTaskCreatedMail = async (task, project, user) => {
   const { name, progress, projectID } = project;
   const { userName, email } = user;
   const mailOptions = {
-    from: `Support <${supportmail}>`,
+    from: `FlowUnit Team <${supportmail}>`,
     to: email,
     subject: "New Task Added",
     replyTo: supportmail,
@@ -813,7 +807,7 @@ const sendTaskUpdatedMail = async (task, project, user) => {
   const { name, progress, createdBy } = project;
   const { userName } = user;
   const mailOptions = {
-    from: `Support <${supportmail}>`,
+    from: `FlowUnit Team <${supportmail}>`,
     to: createdBy.email,
     subject: "Task Updated",
     replyTo: supportmail,
@@ -870,7 +864,7 @@ const sendTaskUpdatedMail = async (task, project, user) => {
 const sendTaskCompletedMail = async (task, project, user) => {
   const { name, progress, createdBy } = project;
   const mailOptions = {
-    from: `Support <${supportmail}>`,
+    from: `FlowUnit Team <${supportmail}>`,
     to: [createdBy.email, user.email],
     subject: "Task Completed",
     replyTo: supportmail,
@@ -979,12 +973,12 @@ const sendTaskCompletedMail = async (task, project, user) => {
                 <p style="font-size:11px;color:#a0aec0;margin:0;">
                 &copy; 2025 Flow Unit. All rights reserved.<br>
                 <a href="mailto:${
-                supportmail || "youngbeeh08@gmail.com"
+                  supportmail || "youngbeeh08@gmail.com"
                 }" style="color:#003366;text-decoration:none;">${
-                supportmail || "youngbeeh08@gmail.com"
-                }</a> |
+      supportmail || "youngbeeh08@gmail.com"
+    }</a> |
                 <a href="${
-                clientDomain || "https://flowunit.vercel.app"
+                  clientDomain || "https://flowunit.vercel.app"
                 }" style="color:#003366;text-decoration:none;">flowunit.vercel.app</a>
                 </p>
                 </td></tr>
@@ -1001,6 +995,276 @@ const sendTaskCompletedMail = async (task, project, user) => {
   console.log("Task completed mail sent successfully:", mail.messageId);
 };
 
+const sendInvitationMail = async (token, team, user) => {
+  const mailOptions = {
+    from: `FlowUnit Team <${supportmail}>`,
+    to: user.email,
+    subject: `You are invited to join ${team.name || "a"} team!`,
+    replyTo: supportmail,
+    html: `
+<body style="margin: 0; padding: 0; min-width: 100%; background-color: #f0f4f8; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+    <table width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #f0f4f8; border-collapse: collapse; min-height: 100vh;">
+        <tr>
+            <td align="center" style="padding: 50px 20px;">
+                <table width="600" cellspacing="0" cellpadding="0" border="0" style="width: 100%; max-width: 600px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 20px rgba(0, 51, 102, 0.08); border-collapse: collapse; overflow: hidden;">
+
+                    <tr>
+                        <td style="background: linear-gradient(135deg, #003366 0%, #004c99 100%); padding: 50px 40px;">
+                            <table width="100%" cellspacing="0" cellpadding="0" border="0">
+                                <tr>
+                                    <td align="center">
+                                        <img src="https://placehold.co/200x60/ffffff/003366?text=Your+Logo" alt="Company Logo" style="max-width: 200px; height: auto; display: block; border: 0;" />
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <td style="padding: 45px 50px;">
+                            <h1 style="font-size: 24px; font-weight: 600; color: #003366; margin: 0 0 10px 0; line-height: 1.3;">🎉 You've Been Invited to Join a Team!</h1>
+                            
+                            <p style="font-size: 15px; line-height: 1.6; color: #4a5568; margin: 0 0 30px 0;">
+                                Dear ${user.userName || "Team Member"},<br><br>
+                                We are excited to invite you to join the **${
+                                  team.name || ""
+                                }** team on **Flow Unit Co.**! We believe your skills and experience would be a great asset to our work, This invitation will expire within 24Hrs.
+                            </p>
+                            
+                            <table width="100%" cellspacing="0" cellpadding="0" border="0" style="margin: 0 0 30px 0;">
+                                <tr>
+                                    <td align="center">
+                                        <table cellspacing="0" cellpadding="0" border="0">
+                                            <tr>
+                                                <td align="center" style="border-radius: 6px; background-color: #004c99;">
+                                                    <a href="${
+                                                      process.env.CLIENT_DOMAIN
+                                                    }/invitation/${
+      team._id
+    }?token=${token}" target="_blank" style="font-size: 16px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; color: #ffffff; text-decoration: none; border-radius: 6px; padding: 12px 25px; border: 1px solid #004c99; display: inline-block; font-weight: 600;">
+                                                        View Invitation
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                        <p style="font-size: 12px; color: #718096; margin: 15px 0 0 0;">This invitation link contains a unique token for your access.</p>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <p style="font-size: 15px; line-height: 1.6; color: #4a5568; margin: 0 0 30px 0;">
+                                If the button above doesn't work, you can copy and paste the following link into your web browser:
+                                <br>
+                                <a href="${
+                                  process.env.CLIENT_DOMAIN
+                                }/invitation/${
+      team._id
+    }?token=${token}" style="word-break: break-all; font-size: 14px; color: #004c99; text-decoration: underline;">${
+      process.env.CLIENT_DOMAIN
+    }/invitation?token=${token}</a>
+                            </p>
+                            
+                            <table width="100%" cellspacing="0" cellpadding="0" border="0" style="margin: 0 0 30px 0;">
+                                <tr>
+                                    <td style="background-color: #e6f3ff; border-left: 4px solid #87CEEB; padding: 20px 25px; border-radius: 4px;">
+                                        <p style="font-size: 14px; line-height: 1.6; color: #003366; margin: 0;">
+                                            <strong style="display: block; margin-bottom: 6px;">Action Required</strong>
+                                            Please click the button to view the full invitation details and accept or decline. If you did not expect this invitation, please contact us immediately at <a href="mailto:${
+                                              supportmail ||
+                                              "flowunitapp@gmail.com"
+                                            }" style="color: #003366; text-decoration: underline;">${
+      supportmail || "flowunitapp@gmail.com"
+    }</a>
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <td style="padding: 0 50px;">
+                            <div style="height: 1px; background-color: #e2e8f0;"></div>
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <td align="center" style="padding: 30px 50px;">
+                            <p style="font-size: 13px; line-height: 1.6; color: #003366; margin: 0 0 8px 0; font-weight: 600;">
+                                Flow Unit Co.
+                            </p>
+                            <p style="font-size: 12px; line-height: 1.6; color: #718096; margin: 0 0 15px 0;">
+                                Task management made simple and effective
+                            </p>
+                            <p style="font-size: 11px; line-height: 1.5; color: #a0aec0; margin: 0;">
+                                &copy; 2025 Flow Unit. All rights reserved.<br>
+                                <a href="mailto:${
+                                  supportmail || "flowunitapp@gmail.com"
+                                }" style="color: #003366; text-decoration: none;">${
+      supportmail || "flowunitapp@gmail.com"
+    }</a> | 
+                                <a href="${
+                                  clientDomain ||
+                                  "https://www.flowunitapp.vercel.app"
+                                }" style="color: #003366; text-decoration: none;">www.flowunitapp.vercel.app</a> | 
+                                <a href="${
+                                  clientDomain ||
+                                  "https://www.flowunitapp.vercel.app"
+                                }/privacy" style="color: #003366; text-decoration: none;">Privacy Policy</a>
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+    `,
+  };
+  const mail = await transporter.sendMail(mailOptions);
+  console.log("Team invitation mail sent successfully:", mail.messageId);
+};
+
+const sendTaskAssignmentMail = async (taskTitle, assignerName, user) => {
+  const dashboardLink = `${clientDomain}/dashboard`;
+  const mailOptions = {
+    from: `FlowUnit Team <${supportmail}>`,
+    to: user.email,
+    subject: `Task Assigned: ${taskTitle}`,
+    replyTo: supportmail,
+    html: `
+<body style="margin: 0; padding: 0; min-width: 100%; background-color: #f0f4f8; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;">
+    <table width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #f0f4f8; border-collapse: collapse; min-height: 100vh;">
+        <tr>
+            <td align="center" style="padding: 50px 20px;">
+                <table width="600" cellspacing="0" cellpadding="0" border="0" style="width: 100%; max-width: 600px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 20px rgba(0, 51, 102, 0.08); border-collapse: collapse; overflow: hidden;">
+
+                    <tr>
+                        <td style="background: linear-gradient(135deg, #003366 0%, #004c99 100%); padding: 50px 40px;">
+                            <table width="100%" cellspacing="0" cellpadding="0" border="0">
+                                <tr>
+                                    <td align="center">
+                                        <img src="https://placehold.co/200x60/ffffff/003366?text=Your+Logo" alt="Company Logo" style="max-width: 200px; height: auto; display: block; border: 0;" />
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <td style="padding: 45px 50px;">
+                            <h1 style="font-size: 24px; font-weight: 600; color: #003366; margin: 0 0 10px 0; line-height: 1.3;">✅ New Task Assigned to You!</h1>
+                            
+                            <p style="font-size: 15px; line-height: 1.6; color: #4a5568; margin: 0 0 20px 0;">
+                                Dear **${user.userName || "Team Member"}**,
+                            </p>
+                            
+                            <table width="100%" cellspacing="0" cellpadding="0" border="0" style="margin: 0 0 30px 0; border: 1px solid #e2e8f0; border-radius: 6px;">
+                                <tr>
+                                    <td style="padding: 20px;">
+                                        <p style="font-size: 15px; line-height: 1.6; color: #4a5568; margin: 0 0 10px 0;">
+                                            You have been assigned a new task by **${
+      assignerName || "a team member"
+    }**.
+                                        </p>
+                                        <p style="font-size: 16px; font-weight: 700; color: #003366; margin: 0;">
+                                            Task: ${taskTitle}
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <p style="font-size: 15px; line-height: 1.6; color: #4a5568; margin: 0 0 30px 0;">
+                                Please click the button below to go to your dashboard and view the full details of this task, including its description, deadline, and priority.
+                            </p>
+                            
+                            <table width="100%" cellspacing="0" cellpadding="0" border="0" style="margin: 0 0 30px 0;">
+                                <tr>
+                                    <td align="center">
+                                        <table cellspacing="0" cellpadding="0" border="0">
+                                            <tr>
+                                                <td align="center" style="border-radius: 6px; background-color: #004c99;">
+                                                    <a href="${dashboardLink}" target="_blank" style="font-size: 16px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; color: #ffffff; text-decoration: none; border-radius: 6px; padding: 12px 25px; border: 1px solid #004c99; display: inline-block; font-weight: 600;">
+                                                        View Task on Dashboard
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                        <p style="font-size: 12px; color: #718096; margin: 15px 0 0 0;">Click the button to manage your new assignment.</p>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <p style="font-size: 15px; line-height: 1.6; color: #4a5568; margin: 0 0 30px 0;">
+                                If the button above doesn't work, you can copy and paste the following link into your web browser:
+                                <br>
+                                <a href="${dashboardLink}" style="word-break: break-all; font-size: 14px; color: #004c99; text-decoration: underline;">${dashboardLink}</a>
+                            </p>
+                            
+                            <table width="100%" cellspacing="0" cellpadding="0" border="0" style="margin: 0 0 30px 0;">
+                                <tr>
+                                    <td style="background-color: #e6f3ff; border-left: 4px solid #87CEEB; padding: 20px 25px; border-radius: 4px;">
+                                        <p style="font-size: 14px; line-height: 1.6; color: #003366; margin: 0;">
+                                            <strong style="display: block; margin-bottom: 6px;">Stay Organized</strong>
+                                            We recommend checking your dashboard regularly for any new assignments or updates to existing tasks. If you have any questions, please reply to this email or contact support at <a href="mailto:${
+      supportmail || "flowunitapp@gmail.com"
+    }" style="color: #003366; text-decoration: underline;">${
+      supportmail || "flowunitapp@gmail.com"
+    }</a>.
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <td style="padding: 0 50px;">
+                            <div style="height: 1px; background-color: #e2e8f0;"></div>
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <td align="center" style="padding: 30px 50px;">
+                            <p style="font-size: 13px; line-height: 1.6; color: #003366; margin: 0 0 8px 0; font-weight: 600;">
+                                Flow Unit Co.
+                            </p>
+                            <p style="font-size: 12px; line-height: 1.6; color: #718096; margin: 0 0 15px 0;">
+                                Task management made simple and effective
+                            </p>
+                            <p style="font-size: 11px; line-height: 1.5; color: #a0aec0; margin: 0;">
+                                &copy; 2025 Flow Unit. All rights reserved.<br>
+                                <a href="mailto:${
+      supportmail || "flowunitapp@gmail.com"
+    }" style="color: #003366; text-decoration: none;">${
+      supportmail || "flowunitapp@gmail.com"
+    }</a> | 
+                                <a href="${dashboardLink
+      .split("/")
+      .slice(0, 3)
+      .join(
+        "/"
+      )}" style="color: #003366; text-decoration: none;">www.flowunitapp.vercel.app</a> | 
+                                <a href="${dashboardLink
+      .split("/")
+      .slice(0, 3)
+      .join(
+        "/"
+      )}/privacy" style="color: #003366; text-decoration: none;">Privacy Policy</a>
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+    `,
+  };
+  const mail = await transporter.sendMail(mailOptions);
+  console.log("Task assignment mail sent successfully:", mail.messageId);
+};
+
 module.exports = {
   sendWelcomeMail,
   sendOtpMail,
@@ -1010,5 +1274,7 @@ module.exports = {
   sendProjectupdatedMail,
   sendTaskCreatedMail,
   sendTaskUpdatedMail,
-  sendTaskCompletedMail
+  sendTaskCompletedMail,
+  sendInvitationMail,
+  sendTaskAssignmentMail,
 };
