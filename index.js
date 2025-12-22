@@ -18,8 +18,9 @@ server.use(
       "http://192.168.1.155:5173",
       "http://localhost:4173",
     ],
-    methods: ["POST", "GET", "PATCH", "DELETE", "PUT"],
+    methods: ["POST", "GET", "PATCH", "DELETE", "PUT", "OPTIONS"],
     credentials: true,
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 server.use(express.static(path.join(__dirname, "public")));
