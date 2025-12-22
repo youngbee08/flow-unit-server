@@ -20,6 +20,7 @@ const {
   declineInvitation,
   assignTask,
   deleteAccount,
+  findUser,
 } = require("../controller/user");
 const isLoggedIn = require("../middlewares/IsLoggedIn");
 const userRouter = express.Router();
@@ -43,6 +44,7 @@ userRouter.get("/findAssignedTasks", isLoggedIn, findAssignedTasks);
 userRouter.post("/createTeam", isLoggedIn, createTeam);
 userRouter.get("/myTeam", isLoggedIn, findMyTeam);
 userRouter.patch("/updateTeamInfo", isLoggedIn, updateTeam);
+userRouter.get("/findUser/:userName", isLoggedIn, findUser);
 userRouter.post("/inviteToTeam/:userID", isLoggedIn, inviteToTeam);
 userRouter.post(
   "/acceptInvitation/:teamID/:token",

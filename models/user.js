@@ -58,6 +58,7 @@ const userSchema = new mongoose.Schema(
     ownerOf: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "teams",
+      select: true,
     },
   },
   { timestamps: true }

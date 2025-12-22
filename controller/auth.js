@@ -37,7 +37,6 @@ const signUp = async (req, res, next) => {
     res.status(200).json({
       status: "success",
       message: "Account created successfully",
-      user,
     });
   } catch (error) {
     console.log("Sign up error", error);
@@ -366,7 +365,7 @@ const logout = async (req, res, next) => {
       return res.status(401).json({ status: "error", message: "Unauthorized" });
     }
     await userModel.findByIdAndUpdate(req.user._id, { currentSession: null });
-    res.json({ status: "success", message: "Logged out successfully" });
+    res.status(200).json({ status: "success", message: "Logged out successfully" });
   } catch (error) {
     console.log("Logout error", error);
     next(error);

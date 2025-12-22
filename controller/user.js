@@ -23,14 +23,7 @@ const viewProfile = async (req, res, next) => {
   try {
     const findUser = await userModel
       .findById(req.user._id)
-      .select([
-        "-password",
-        "-otp",
-        "-otpExp",
-        "-currentSession",
-        "-isVerified",
-        "-isDisabled",
-      ])
+      .select(["-password", "-otp", "-otpExp"])
       .populate("projects");
     if (!findUser) {
       return res.status(422).json({
@@ -38,10 +31,24 @@ const viewProfile = async (req, res, next) => {
         message: "Please provide a valid token",
       });
     }
+    const userProject = await projectModel.find({ createdBy: findUser._id });
+    const total_projects = userProject.length;
+    const projectIds = userProject.map((p) => p._id);
+
+    const userTasks = await taskModel.find({
+      project: { $in: projectIds },
+    });
+    const pendingTasks = userTasks.filter((t) => t.status === "todo");
+    const completedProjects = userProject.filter(
+      (p) => p.status === "completed"
+    );
     res.json({
       status: "success",
-      message: "User found successful",
+      message: "Profile loaded successful",
       user: findUser,
+      total_projects,
+      pending_tasks: pendingTasks.length,
+      completed_projects: completedProjects.length,
     });
   } catch (error) {
     console.log("vie-profile error", error);
@@ -150,14 +157,7 @@ const updateProfile = async (req, res, next) => {
 
     const updatedUser = await userModel
       .findByIdAndUpdate(req?.user?._id, req.body, { new: true })
-      .select([
-        "-password",
-        "-otp",
-        "-otpExp",
-        "-currentSession",
-        "-isVerified",
-        "-isDisabled",
-      ]);
+      .select(["-password", "-otp", "-otpExp"]);
     let message = `Profile updated successfully.${
       req?.body?.userName ? " Avatar regenerated to match new username" : ""
     }`;
@@ -620,7 +620,7 @@ const updateTask = async (req, res, next) => {
     }
 
     if (isAssigned && !isOwner) {
-      const allowed = ["status", "description"];
+      const allowed = ["status"];
       const invalidFields = Object.keys(req.body).filter(
         (key) => !allowed.includes(key)
       );
@@ -786,10 +786,31 @@ const deleteTask = async (req, res, next) => {
 
 const findAssignedTasks = async (req, res, next) => {
   if (!req?.user) {
-    return res.status(401).json({ status: "error", message: "Unauthorized" });
+    return res.status(401).json({
+      status: "error",
+      message: "Unauthorized",
+    });
   }
+
   try {
-    const assignedTasks = await taskModel.find({ assignedTo: req.user._id });
+    const { search, status } = req.query;
+
+    const query = {
+      assignedTo: req.user._id,
+    };
+
+    if (status) {
+      query.status = status;
+    }
+
+    if (search) {
+      query.name = { $regex: search, $options: "i" };
+    }
+
+    const assignedTasks = await taskModel
+      .find(query)
+      .populate(["project", "assignedTo"]);
+
     return res.status(200).json({
       status: "success",
       message:
@@ -848,7 +869,9 @@ const findMyTeam = async (req, res, next) => {
     return res.status(401).json({ status: "error", message: "Unauthorized" });
   }
   try {
-    const myTeam = await teamModel.findById(req.user.ownerOf);
+    const myTeam = await teamModel
+      .findById(req.user.ownerOf)
+      .populate("members");
     if (!myTeam) {
       return res.status(200).json({
         status: "success",
@@ -894,6 +917,36 @@ const updateTeam = async (req, res, next) => {
       .json({ status: "success", message: "Team info updated successfully" });
   } catch (error) {
     console.log("Error while updating team info", error);
+    next(error);
+  }
+};
+
+const findUser = async (req, res, next) => {
+  if (!req?.user) {
+    return res.status(401).json({ status: "error", message: "Unauthorized" });
+  }
+  if (!req.params.userName) {
+    return res.status(400).json({
+      status: "error",
+      message: "Please provide user username",
+    });
+  }
+  try {
+    const users = await userModel
+      .find({ userName: req.params.userName })
+      .select(["-otp", "-otpExp", "-currentSession"]);
+    if (!users) {
+      return res.status(404).json({
+        status: "error",
+        message: "Couldn't find user with that username",
+        users: [],
+      });
+    }
+    res
+      .status(200)
+      .json({ status: "success", message: "Users found successful", users });
+  } catch (error) {
+    console.log("errorFindingUser", error);
     next(error);
   }
 };
@@ -1186,7 +1239,6 @@ const deleteAccount = async (req, res, next) => {
   }
 };
 
-
 module.exports = {
   viewProfile,
   updatePassword,
@@ -1204,6 +1256,7 @@ module.exports = {
   findMyTeam,
   updateTeam,
   inviteToTeam,
+  findUser,
   acceptInvitation,
   declineInvitation,
   assignTask,
