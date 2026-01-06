@@ -21,6 +21,8 @@ const {
   assignTask,
   deleteAccount,
   findUser,
+  getSingleProject,
+  findProjects,
 } = require("../controller/user");
 const isLoggedIn = require("../middlewares/IsLoggedIn");
 const userRouter = express.Router();
@@ -35,6 +37,7 @@ userRouter.get(
   isLoggedIn,
   checkProjectNameExist
 );
+userRouter.get("/project/:projectID", isLoggedIn, getSingleProject);
 userRouter.get("/validateTaskName", isLoggedIn, checkTaskNameExist);
 userRouter.patch("/updateProject/:projectID", isLoggedIn, updateProject);
 userRouter.patch("/updateTask/:taskID", isLoggedIn, updateTask);
@@ -43,6 +46,7 @@ userRouter.delete("/deleteTask", isLoggedIn, deleteTask);
 userRouter.get("/findAssignedTasks", isLoggedIn, findAssignedTasks);
 userRouter.post("/createTeam", isLoggedIn, createTeam);
 userRouter.get("/myTeam", isLoggedIn, findMyTeam);
+userRouter.get("/myProjects", isLoggedIn, findProjects);
 userRouter.patch("/updateTeamInfo", isLoggedIn, updateTeam);
 userRouter.get("/findUser/:userName", isLoggedIn, findUser);
 userRouter.post("/inviteToTeam/:userID", isLoggedIn, inviteToTeam);

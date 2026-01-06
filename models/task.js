@@ -34,14 +34,14 @@ const taskSchema = new mongoose.Schema(
     },
     project: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Projects",
+      ref: "projects",
       required: true,
     },
-    cantUpdate:{
-      type:Boolean,
-      trim:true,
-      default:false
-    }
+    cantUpdate: {
+      type: Boolean,
+      trim: true,
+      default: false,
+    },
   },
   { timestamps: true }
 );

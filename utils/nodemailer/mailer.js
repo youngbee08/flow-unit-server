@@ -521,7 +521,7 @@ const sendPasswordResetSecurityMail = async (user, userName) => {
 };
 
 const sendProjectCreatedMail = async (project, user) => {
-  const { name, projectID } = project;
+  const { name, _id } = project;
   const { userName, email } = user;
   const mailOptions = {
     from: `FlowUnit Team <${supportmail}>`,
@@ -560,8 +560,10 @@ const sendProjectCreatedMail = async (project, user) => {
 
     <table width="100%" style="margin:0 0 30px;">
     <tr><td align="center">
-    <a href="${clientDomain || "https://flowunit.vercel.app"}/projects/${
-      projectID || ""
+    <a href="${
+      clientDomain || "https://flowunit.vercel.app"
+    }/dashboard/projects/${
+      _id || ""
     }" style="background-color:#003366;color:#ffffff;text-decoration:none;padding:12px 25px;border-radius:6px;font-size:15px;font-weight:500;">View Project</a>
     </td></tr>
     </table>
@@ -662,7 +664,7 @@ const sendProjectupdatedMail = async (project, user, changes) => {
                     <td align="center" bgcolor="#003366" style="border-radius: 6px;">
                         <a href="${
                           clientDomain || "https://flowunit.vercel.app"
-                        }/projects" style="font-size: 15px; color: #ffffff; text-decoration: none; padding: 14px 40px; display: inline-block; font-weight: 600; letter-spacing: 0.5px;">
+                        }/dashboard/projects/${project._id}" style="font-size: 15px; color: #ffffff; text-decoration: none; padding: 14px 40px; display: inline-block; font-weight: 600; letter-spacing: 0.5px;">
                         View Project
                         </a>
                     </td>
@@ -733,7 +735,7 @@ const sendProjectupdatedMail = async (project, user, changes) => {
 };
 
 const sendTaskCreatedMail = async (task, project, user) => {
-  const { name, progress, projectID } = project;
+  const { name, progress, _id } = project;
   const { userName, email } = user;
   const mailOptions = {
     from: `FlowUnit Team <${supportmail}>`,
@@ -766,8 +768,10 @@ const sendTaskCreatedMail = async (task, project, user) => {
 
     <table width="100%" style="margin:0 0 30px;">
     <tr><td align="center">
-    <a href="${clientDomain || "https://flowunit.vercel.app"}/projects/${
-      projectID || ""
+    <a href="${
+      clientDomain || "https://flowunit.vercel.app"
+    }/dashboard/projects/${
+      _id || ""
     }" style="background-color:#003366;color:#ffffff;text-decoration:none;padding:12px 25px;border-radius:6px;font-size:15px;">View Task</a>
     </td></tr>
     </table>

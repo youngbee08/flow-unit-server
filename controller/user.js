@@ -23,8 +23,7 @@ const viewProfile = async (req, res, next) => {
   try {
     const findUser = await userModel
       .findById(req.user._id)
-      .select(["-password", "-otp", "-otpExp"])
-      .populate("projects");
+      .select(["-password", "-otp", "-otpExp", "-projects"]);
     if (!findUser) {
       return res.status(422).json({
         status: "error",
@@ -280,6 +279,47 @@ const checkProjectNameExist = async (req, res, next) => {
     });
   } catch (error) {
     console.log("checkProjectNameExist-error", error);
+    next(error);
+  }
+};
+
+const getSingleProject = async (req, res, next) => {
+  if (!req?.user) {
+    return res.status(401).json({ status: "error", message: "Unauthorized" });
+  }
+  if (!req.params.projectID) {
+    return res.status(400).json({
+      status: "error",
+      message: "Please provide project ID parameter",
+    });
+  }
+  const { projectID } = req.params;
+  if (!mongoose.Types.ObjectId.isValid(projectID)) {
+    return res.status(400).json({
+      status: "error",
+      message: "Invalid project ID format",
+    });
+  }
+  try {
+    const singleProject = await projectModel
+      .findOne({
+        createdBy: req.user._id,
+        _id: projectID,
+      })
+      .populate("tasks");
+    if (!singleProject) {
+      return res.status(404).json({
+        status: "error",
+        message: "Unable to find project with the provided ID",
+      });
+    }
+    res.status(200).json({
+      status: "success",
+      message: "Project found successful",
+      project: singleProject,
+    });
+  } catch (error) {
+    console.log("singleProjectError", error);
     next(error);
   }
 };
@@ -889,6 +929,40 @@ const findMyTeam = async (req, res, next) => {
   }
 };
 
+const findProjects = async (req, res, next) => {
+  if (!req?.user) {
+    return res.status(401).json({ status: "error", message: "Unauthorized" });
+  }
+  if (!req?.query?.type) {
+    return res
+      .status(400)
+      .json({ status: "error", message: "Please provide project type" });
+  }
+  try {
+    const { type } = req.query;
+    const query = {
+      createdBy: req.user._id,
+    };
+    if (type === "team") {
+      query.type = type;
+    }
+    const projects = await projectModel.find(query);
+    if (!projects) {
+      return res
+        .status(404)
+        .json({ status: "error", message: "Couldn't find any project matching your project type" });
+    }
+    res.status(200).json({
+      status: "success",
+      message: "Project found successfull",
+      projects,
+    });
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+};
+
 const updateTeam = async (req, res, next) => {
   if (!req?.user) {
     return res.status(401).json({ status: "error", message: "Unauthorized" });
@@ -1245,6 +1319,7 @@ module.exports = {
   updateProfile,
   createProject,
   checkProjectNameExist,
+  getSingleProject,
   updateProject,
   deleteProject,
   createTask,
@@ -1254,6 +1329,7 @@ module.exports = {
   findAssignedTasks,
   createTeam,
   findMyTeam,
+  findProjects,
   updateTeam,
   inviteToTeam,
   findUser,

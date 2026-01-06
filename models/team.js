@@ -17,7 +17,7 @@ const teamSchema = new mongoose.Schema(
       ref: "users",
       required: true,
     },
-    members: [{ type: mongoose.Schema.Types.ObjectId, ref: "users" }],
+    members: [{ type: mongoose.Schema.Types.ObjectId, ref: "Users" }],
     projects: [{ type: mongoose.Schema.Types.ObjectId, ref: "projects" }],
   },
   { timestamps: true }
