@@ -911,7 +911,7 @@ const findMyTeam = async (req, res, next) => {
   try {
     const myTeam = await teamModel
       .findById(req.user.ownerOf)
-      .populate("members");
+      .populate(["members", "projects"]);
     if (!myTeam) {
       return res.status(200).json({
         status: "success",
@@ -948,9 +948,10 @@ const findProjects = async (req, res, next) => {
     }
     const projects = await projectModel.find(query);
     if (!projects) {
-      return res
-        .status(404)
-        .json({ status: "error", message: "Couldn't find any project matching your project type" });
+      return res.status(404).json({
+        status: "error",
+        message: "Couldn't find any project matching your project type",
+      });
     }
     res.status(200).json({
       status: "success",
@@ -1007,18 +1008,31 @@ const findUser = async (req, res, next) => {
   }
   try {
     const users = await userModel
-      .find({ userName: req.params.userName })
-      .select(["-otp", "-otpExp", "-currentSession"]);
+      .find({ userName: req.params.userName, _id: { $ne: req.user._id } })
+      .select([
+        "-otp",
+        "-otpExp",
+        "-currentSession",
+        "-password",
+        "-createdAt",
+        "-updatedAt",
+        "-ownerOf",
+        "-isDisabled",
+        "-isVerified",
+        "-email",
+      ]);
     if (!users) {
       return res.status(404).json({
-        status: "error",
+        status: "success",
         message: "Couldn't find user with that username",
         users: [],
       });
     }
-    res
-      .status(200)
-      .json({ status: "success", message: "Users found successful", users });
+    res.status(200).json({
+      status: "success",
+      message: "Users found successful",
+      users: users,
+    });
   } catch (error) {
     console.log("errorFindingUser", error);
     next(error);
@@ -1066,6 +1080,12 @@ const inviteToTeam = async (req, res, next) => {
         status: "error",
         message:
           "Invalid ID, Couldn't found an account with the ID you provide.",
+      });
+    }
+    if (req?.user._id === req?.params?.userID) {
+      return res.status(403).json({
+        status: "error",
+        message: "You can't invite yourself to your own team",
       });
     }
     if (
