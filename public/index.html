@@ -1,11 +1,216 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FlowUnit Server</title>
-</head>
-<body>
-  <h1>Hi FlowUnit dev</h1>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap"
+      rel="stylesheet"
+    />
+    <title>Flow Unit API | Node.js & Express</title>
+
+    <style>
+      :root {
+        --color-primary: #13213b;
+        --color-tertiary: #e0e0e0;
+        --accent: #b7babe;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Nunito", sans-serif;
+      }
+      body {
+        background: var(--color-primary);
+        color: var(--color-tertiary);
+        scroll-behavior: smooth;
+      }
+
+      header {
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        text-align: center;
+        padding: 20px;
+        animation: fadeUp 1.3s ease;
+      }
+
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(25px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      h1 {
+        font-size: 3rem;
+        background: linear-gradient(45deg, #b7babe, #b7babe);
+        -webkit-background-clip: text;
+        color: transparent;
+        letter-spacing: 1.4px;
+      }
+
+      .tagline {
+        font-size: 1.15rem;
+        margin: 18px 0 35px;
+        opacity: 0.9;
+        max-width: 700px;
+      }
+
+      header a {
+        background: var(--accent);
+        color: #000;
+        text-decoration: none;
+        padding: 12px 22px;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: 0.35s;
+      }
+
+      header a:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 0 22px rgba(224, 224, 224, 0.45);
+      }
+
+      section {
+        max-width: 900px;
+        margin: 70px auto;
+        padding: 40px;
+        border-radius: 14px;
+        background: #00141f;
+        box-shadow: 0 0 35px rgba(0, 255, 200, 0.08);
+        border: 1px solid rgba(0, 255, 200, 0.04);
+      }
+
+      section h2 {
+        font-size: 2rem;
+        margin-bottom: 18px;
+        border-left: 4px solid var(--accent);
+        padding-left: 10px;
+      }
+
+      p {
+        line-height: 1.7rem;
+        margin-bottom: 10px;
+        opacity: 0.88;
+      }
+
+      .code {
+        background: #000c13;
+        border: 1px solid rgba(0, 255, 200, 0.12);
+        padding: 14px;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        overflow: auto;
+        white-space: pre-wrap;
+        margin-top: 12px;
+      }
+
+      a.link {
+        display: inline-block;
+        margin-top: 10px;
+        text-decoration: none;
+        color: var(--accent);
+        font-weight: 600;
+      }
+
+      footer {
+        text-align: center;
+        margin: 60px 0 25px;
+        opacity: 0.55;
+        font-size: 0.9rem;
+      }
+
+      @media (max-width: 768px) {
+        h1 {
+          font-size: 2.2rem;
+        }
+        section {
+          margin: 40px 15px;
+          padding: 25px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <h1>Flow Unit API ⚡</h1>
+      <p class="tagline">
+        A secure, scalable task management & team collaboration backend built
+        with Node.js, Express, MongoDB, and JWT authentication.
+      </p>
+      <a href="#overview">View Documentation</a>
+    </header>
+
+    <section id="overview">
+      <h2>📌 Overview</h2>
+      <p>
+        <strong>Flow Unit</strong> is a robust project and task management API
+        designed to support personal and team-based workflows. It enables
+        structured project tracking, task delegation, team collaboration, and
+        automated email notifications through a modern RESTful architecture.
+      </p>
+    </section>
+
+    <section>
+      <h2>✨ Core Features</h2>
+      <p>• Node.js & Express-based REST API</p>
+      <p>• MongoDB with Mongoose ODM</p>
+      <p>• JWT-based authentication & authorization</p>
+      <p>• OTP verification & password recovery</p>
+      <p>• Team creation, invitations & collaboration</p>
+      <p>• Nodemailer-powered transactional emails</p>
+    </section>
+
+    <section>
+      <h2>⚙️ Getting Started</h2>
+      <p>Clone the repository:</p>
+      <div class="code">git clone https://github.com/youngbee08/flow-unit-server.git</div>
+      <p>Install dependencies and start the server:</p>
+      <div class="code">npm install
+npm start</div>
+    </section>
+
+    <section>
+      <h2>🔐 Environment Variables</h2>
+      <div class="code">MONGO_URI=mongodb://localhost:27017/flowunit
+SERVER_PORT=1000
+JWT_SECRET=your_jwt_secret_key
+JWT_EXP=7d
+SERVER_MAIL=your-email@gmail.com
+SERVER_PASS=your-app-password
+SERVER_SUPPORT_MAIL=support@flowunit.com
+CLIENT_DOMAIN=http://localhost:5173</div>
+    </section>
+
+    <section>
+      <h2>🔌 API Base URL</h2>
+      <div class="code">http://localhost:1000/api</div>
+    </section>
+
+    <section>
+      <h2>👤 Author</h2>
+      <p><strong>Zenith Dev</strong></p>
+      <a class="link" href="https://github.com/youngbee08" target="_blank">GitHub</a><br />
+      <a class="link" href="https://bamitaleabdulazeem.vercel.app" target="_blank">Portfolio</a><br />
+      <a class="link" href="https://www.linkedin.com/in/bamitale-abdulazeem-" target="_blank">LinkedIn</a>
+    </section>
+
+    <footer>
+      Flow Unit © <span id="year"></span> — Node.js • Express • MongoDB
+    </footer>
+
+    <script>
+      document.getElementById("year").textContent = new Date().getFullYear();
+    </script>
+  </body>
 </html>
