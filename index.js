@@ -13,11 +13,7 @@ server.use(express.json());
 const allowedOrigin = process.env.CLIENT_DOMAIN;
 server.use(
   cors({
-    origin: [
-      allowedOrigin,
-      "http://192.168.1.155:5173",
-      "http://localhost:4173",
-    ],
+    origin: allowedOrigin,
     methods: ["POST", "GET", "PATCH", "DELETE", "PUT", "OPTIONS"],
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],
