@@ -1131,11 +1131,6 @@ const acceptInvitation = async (req, res, next) => {
   if (!req?.user) {
     return res.status(401).json({ status: "error", message: "Unauthorized" });
   }
-  if (Object.keys(req.body).length === 0) {
-    return res
-      .status(400)
-      .json({ status: "error", message: "All fields are required" });
-  }
   if (!req.params.teamID) {
     return res.status(403).json({
       status: "error",
@@ -1196,11 +1191,6 @@ const acceptInvitation = async (req, res, next) => {
 const declineInvitation = async (req, res, next) => {
   if (!req?.user) {
     return res.status(401).json({ status: "error", message: "Unauthorized" });
-  }
-  if (Object.keys(req.body).length === 0) {
-    return res
-      .status(400)
-      .json({ status: "error", message: "All fields are required" });
   }
   if (!req.params.token) {
     return res.status(403).json({
@@ -1333,6 +1323,38 @@ const deleteAccount = async (req, res, next) => {
   }
 };
 
+const findTeam = async (req, res, next) => {
+  if (!req?.user) {
+    return res.status(401).json({ status: "error", message: "Unauthorized" });
+  }
+  if (!req.params.teamID) {
+    return res.status(403).json({
+      status: "error",
+      message: "Please provide the ID of the team you want to join.",
+    });
+  }
+  if (!mongoose.Types.ObjectId.isValid(req.params.teamID)) {
+    return res.status(400).json({ message: "Invalid team ID" });
+  }
+  try {
+    const team = await teamModel.findById(req.params.teamID);
+    if (!team) {
+      return res.status(400).json({
+        status: "error",
+        message: "Failed to find team, please try again",
+      });
+    }
+    res.status(200).json({
+      status: "success",
+      message: "Team found successfully",
+      team,
+    });
+  } catch (error) {
+    console.log("errorFindingTeam", error);
+    next(error);
+  }
+};
+
 module.exports = {
   viewProfile,
   updatePassword,
@@ -1357,4 +1379,5 @@ module.exports = {
   declineInvitation,
   assignTask,
   deleteAccount,
+  findTeam,
 };

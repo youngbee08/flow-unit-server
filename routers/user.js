@@ -23,6 +23,7 @@ const {
   findUser,
   getSingleProject,
   findProjects,
+  findTeam,
 } = require("../controller/user");
 const isLoggedIn = require("../middlewares/IsLoggedIn");
 const userRouter = express.Router();
@@ -58,5 +59,6 @@ userRouter.post(
 userRouter.post("/declineInvitation/:token", isLoggedIn, declineInvitation);
 userRouter.post("/assignTask", isLoggedIn, assignTask);
 userRouter.delete("/deleteAccount", isLoggedIn, deleteAccount);
+userRouter.get("/findTeam/:teamID", isLoggedIn, findTeam);
 
 module.exports = userRouter;
