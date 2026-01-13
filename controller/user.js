@@ -645,7 +645,7 @@ const updateTask = async (req, res, next) => {
     const isOwner = project.createdBy._id.equals(req.user._id);
     const isAssigned = findTask.assignedTo.equals(req.user._id);
 
-    if (!isOwner || !isAssigned) {
+    if (!isAssigned && !isOwner) {
       return res.status(403).json({
         status: "error",
         message: "You don't have permission to update this task.",
@@ -661,15 +661,14 @@ const updateTask = async (req, res, next) => {
 
     if (isAssigned && !isOwner) {
       const allowed = ["status"];
+      const ignoredFields = ["projectID"];
       const invalidFields = Object.keys(req.body).filter(
-        (key) => !allowed.includes(key)
+        (key) => !allowed.includes(key) && !ignoredFields.includes(key)
       );
       if (invalidFields.length > 0) {
         return res.status(403).json({
           status: "error",
-          message: `You cannot update the following fields: ${invalidFields.join(
-            ", "
-          )}`,
+          message: `You can only update: ${allowed.join(", ")}`,
         });
       }
     }
@@ -1232,11 +1231,6 @@ const declineInvitation = async (req, res, next) => {
 const assignTask = async (req, res, next) => {
   if (!req?.user) {
     return res.status(401).json({ status: "error", message: "Unauthorized" });
-  }
-  if (Object.keys(req.body).length === 0) {
-    return res
-      .status(400)
-      .json({ status: "error", message: "All fields are required" });
   }
   if (!req.query.task) {
     return res.status(403).json({

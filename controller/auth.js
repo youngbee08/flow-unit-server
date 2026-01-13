@@ -327,6 +327,17 @@ const login = async (req, res, next) => {
       });
     }
     if (!validateUser.isVerified) {
+      const otp = generateOtp(6);
+      const otpExp = Date.now() + 5 * 60 * 1000;
+      const updatedUser = await userModel.findByIdAndUpdate(
+        validateUser._id,
+        {
+          otp: otp,
+          otpExp: otpExp,
+        },
+        { new: true }
+      );
+      await sendOtpMail(updatedUser, updatedUser.userName, otp);
       return res.status(400).json({
         status: "error",
         message: "Please verify your account before you login",
@@ -365,7 +376,9 @@ const logout = async (req, res, next) => {
       return res.status(401).json({ status: "error", message: "Unauthorized" });
     }
     await userModel.findByIdAndUpdate(req.user._id, { currentSession: null });
-    res.status(200).json({ status: "success", message: "Logged out successfully" });
+    res
+      .status(200)
+      .json({ status: "success", message: "Logged out successfully" });
   } catch (error) {
     console.log("Logout error", error);
     next(error);

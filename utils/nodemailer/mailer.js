@@ -55,8 +55,8 @@ const sendWelcomeMail = async (user, userName, otp) => {
                                             <td align="center">
                                                 <a href="${
                                                   clientDomain ||
-                                                  "https://www.flowunit.vercel.app/"
-                                                }dashboard" style="display: inline-block; background-color: #003366; color: #ffffff; text-decoration: none; padding: 16px 40px; border-radius: 6px; font-weight: 600; font-size: 16px; letter-spacing: 0.3px;">Get Started Now</a>
+                                                  "https://www.flowunitapp.vercel.app"
+                                                }/dashboard/overview" style="display: inline-block; background-color: #003366; color: #ffffff; text-decoration: none; padding: 16px 40px; border-radius: 6px; font-weight: 600; font-size: 16px; letter-spacing: 0.3px;">Get Started Now</a>
                                             </td>
                                         </tr>
                                     </table>
@@ -664,7 +664,9 @@ const sendProjectupdatedMail = async (project, user, changes) => {
                     <td align="center" bgcolor="#003366" style="border-radius: 6px;">
                         <a href="${
                           clientDomain || "https://flowunit.vercel.app"
-                        }/dashboard/projects/${project._id}" style="font-size: 15px; color: #ffffff; text-decoration: none; padding: 14px 40px; display: inline-block; font-weight: 600; letter-spacing: 0.5px;">
+                        }/dashboard/projects/${
+      project._id
+    }" style="font-size: 15px; color: #ffffff; text-decoration: none; padding: 14px 40px; display: inline-block; font-weight: 600; letter-spacing: 0.5px;">
                         View Project
                         </a>
                     </td>
@@ -1130,7 +1132,7 @@ const sendInvitationMail = async (token, team, user) => {
 };
 
 const sendTaskAssignmentMail = async (taskTitle, assignerName, user) => {
-  const dashboardLink = `${clientDomain}/dashboard`;
+  const dashboardLink = `${clientDomain}/dashboard/overview`;
   const mailOptions = {
     from: `FlowUnit Team <${supportmail}>`,
     to: user.email,
@@ -1248,7 +1250,7 @@ const sendTaskAssignmentMail = async (taskTitle, assignerName, user) => {
       .slice(0, 3)
       .join(
         "/"
-      )}" style="color: #003366; text-decoration: none;">www.flowunitapp.vercel.app</a> | 
+      )}" style="color: #003366; text-decoration: none;">flowunitapp</a> | 
                                 <a href="${dashboardLink
       .split("/")
       .slice(0, 3)
