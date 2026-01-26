@@ -6,6 +6,7 @@ const errorHandler = require("./middlewares/errorHandler");
 const userRouter = require("./routers/user");
 const path = require("path");
 const cors = require("cors");
+const aiRouter = require("./routers/ai");
 dotenv.config();
 
 const server = express();
@@ -17,7 +18,7 @@ server.use(
     methods: ["POST", "GET", "PATCH", "DELETE", "PUT", "OPTIONS"],
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],
-  })
+  }),
 );
 server.use(express.static(path.join(__dirname, "public")));
 const serverPort = process.env.SERVER_PORT || 1000;
@@ -34,6 +35,7 @@ startServer();
 
 server.use("/api/auth", authRouter);
 server.use("/api/user", userRouter);
+server.use("/api/ai", aiRouter);
 
 server.all("/{*any}", (req, res) => {
   res.status(403).json({
