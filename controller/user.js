@@ -997,17 +997,30 @@ const updateTeam = async (req, res, next) => {
 
 const findUser = async (req, res, next) => {
   if (!req?.user) {
-    return res.status(401).json({ status: "error", message: "Unauthorized" });
-  }
-  if (!req.params.userName) {
-    return res.status(400).json({
+    return res.status(401).json({
       status: "error",
-      message: "Please provide user username",
+      message: "Unauthorized",
     });
   }
+
+  if (!req.params.search) {
+    return res.status(400).json({
+      status: "error",
+      message: "Please provide user username or email",
+    });
+  }
+
   try {
+    const search = req.params.search;
+
     const users = await userModel
-      .find({ userName: req.params.userName, _id: { $ne: req.user._id } })
+      .find({
+        $or: [
+          { userName: search },
+          { email: search }
+        ],
+        _id: { $ne: req.user._id }, // Exclude current user
+      })
       .select([
         "-otp",
         "-otpExp",
@@ -1020,23 +1033,27 @@ const findUser = async (req, res, next) => {
         "-isVerified",
         "-email",
       ]);
-    if (!users) {
+
+    if (!users || users.length === 0) {
       return res.status(404).json({
         status: "success",
-        message: "Couldn't find user with that username",
+        message: "Couldn't find user with that username or email",
         users: [],
       });
     }
-    res.status(200).json({
+
+    return res.status(200).json({
       status: "success",
-      message: "Users found successful",
-      users: users,
+      message: "Users found successfully",
+      users,
     });
+
   } catch (error) {
-    console.log("errorFindingUser", error);
+    console.error("errorFindingUser:", error);
     next(error);
   }
 };
+
 
 const inviteToTeam = async (req, res, next) => {
   if (!req?.user) {
